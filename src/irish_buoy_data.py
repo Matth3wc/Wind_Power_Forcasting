@@ -2,7 +2,7 @@ import pandas as pd
 from erddapy import ERDDAP
 
 class IrishBuoyData:
-    def __init__(self, station_id="M6"):
+    def __init__(self, station_id="M5"):
         self.station_id = station_id
         self.e = ERDDAP(
             server="https://erddap.marine.ie/erddap",
