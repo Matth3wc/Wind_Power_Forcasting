@@ -8,6 +8,8 @@ import pandas as pd  # For data manipulation and analysis
 import numpy as np  # For numerical computations
 import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations
 import seaborn as sns  # For statistical data visualization
+import streamlit as st  # For building interactive web applications
+
 import sys
 import os
 
