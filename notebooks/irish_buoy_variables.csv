@@ -1,0 +1,23 @@
+Variable,Units,Description
+AtmosphericPressure,millibars,Air pressure
+WindDirection,degrees true,Wind direction
+WindSpeed,knots,Wind speed
+AirTemperature,degrees_C,Air temperature
+DewPoint,degrees_C,Dew point temperature
+SeaTemperature,degrees_C,Sea surface temperature
+RelativeHumidity,percent,Relative humidity
+WaveHeight,meters,Wave height
+WavePeriod,seconds,Wave period
+MeanWaveDirection,degrees_true,Mean wave direction
+Hmax,meters,Maximum wave height
+SprTp,degrees,Directional spreading at the spectral peak period
+ThTp,degrees_true,Directional spreading at the spectral peak period
+Tp,seconds,Period of peak wave
+salinity,dimensionless,Salinity
+station_id,,Station ID
+CallSign,,Call Sign
+longitude,degrees_east,longitude of measurement
+latitude,degrees_north,latitude of measurement
+time,seconds since 1970-01-01T00:00:00Z,time of measurement
+Gust,knots,Wind gust speed
+QC_Flag,,quality flag for all measurements
