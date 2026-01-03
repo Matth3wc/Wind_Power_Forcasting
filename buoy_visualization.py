@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 # Add the src directory to Python path
 sys.path.insert(0, '/Users/mattthew/Documents/GitHub/Wind_Power_Forcasting/src')
 
-from irish_buoy_data import IrishBuoyData
+from irish_M_buoy_data import IrishBuoyData
 
 # Configure page
 st.set_page_config(
