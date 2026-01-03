@@ -43,6 +43,7 @@ class IrishBuoyData:
         """Returns the wave-enhanced feature set."""
         return df[self.met_features + self.wave_features]'''
 
+# irish_M_buoy_data.py (FINAL CORRECTED VERSION)
 
 import pandas as pd
 from erddapy import ERDDAP
@@ -57,51 +58,53 @@ class IrishBuoyData:
         )
         self.e.dataset_id = "IWBNetwork"
         
-        # ALL available variables (raw names for API)
+        # ACTUAL AVAILABLE variables (verified from API)
         self.all_raw_variables = [
+            "AtmosphericPressure",
+            "WindDirection",
             "WindSpeed",
-            "WindDirection", 
-            "WindGust",
+            "Gust",              # Note: "Gust" not "WindGust"
+            "WaveHeight",
+            "WavePeriod",
+            "MeanWaveDirection",
+            "Hmax",
             "AirTemperature",
             "DewPoint",
-            "Humidity",
-            "AtmosphericPressure",
-            "WaveHeight",
-            "Hmax",
-            "MeanWavePeriod",
-            "Tp",
-            "PeakDirection",
-            "MeanDirection",
             "SeaTemperature",
-            "Salinity"
+            "salinity",          # Note: lowercase "salinity"
+            "RelativeHumidity",
+            "SprTp",
+            "ThTp",
+            "Tp"
         ]
         
         # Column names as they appear in DataFrame (with units)
         self.met_features = [
-            "WindSpeed (knots)", 
+            "WindSpeed (knots)",
             "WindDirection (degrees)",
-            "WindGust (knots)",
+            "Gust (knots)",
             "AirTemperature (degrees_C)",
             "DewPoint (degrees_C)",
-            "Humidity (%)",
+            "RelativeHumidity (%)",
             "AtmosphericPressure (millibars)"
         ]
         
         self.wave_features = [
-            "WaveHeight (meters)", 
+            "WaveHeight (meters)",
             "Hmax (meters)",
-            "MeanWavePeriod (seconds)",
+            "WavePeriod (seconds)",
             "Tp (seconds)",
-            "PeakDirection (degrees)",
-            "MeanDirection (degrees)"
+            "SprTp (seconds)",
+            "ThTp (seconds)",
+            "MeanWaveDirection (degrees)"
         ]
         
         self.water_features = [
             "SeaTemperature (degrees_C)",
-            "Salinity (PSU)"
+            "salinity (PSU)"
         ]
         
-        # Legacy features (for backward compatibility)
+        # Legacy basic features (for backward compatibility)
         self.basic_features = [
             "WindSpeed (knots)", 
             "AirTemperature (degrees_C)", 
@@ -111,22 +114,28 @@ class IrishBuoyData:
             "Tp (seconds)"
         ]
         
-    def fetch_data(self, days_back=30, variables: Optional[List[str]] = None):
+    def fetch_data(self, days_back=30, variables: Optional[List[str]] = None, include_all=False):
         """
         Fetches data from the Marine Institute.
         
         Args:
             days_back: Number of days of historical data
-            variables: List of raw variable names to fetch (None = all available)
+            variables: List of raw variable names to fetch
+            include_all: If True, fetch all available variables
         
         Returns:
             DataFrame with requested variables
         """
-        # Use all variables if none specified
-        if variables is None:
+        if include_all:
+            # Fetch all available variables
             request_vars = ["time", "station_id"] + self.all_raw_variables
-        else:
+        elif variables is not None:
+            # Use specified variables
             request_vars = ["time", "station_id"] + variables
+        else:
+            # Default: use basic features for backward compatibility
+            request_vars = ["time", "station_id", "WindSpeed", "AirTemperature", 
+                           "AtmosphericPressure", "WaveHeight", "Hmax", "Tp"]
         
         self.e.variables = request_vars
         self.e.constraints = {
@@ -138,25 +147,16 @@ class IrishBuoyData:
             df = self.e.to_pandas(index_col="time (UTC)", parse_dates=True)
             return df.dropna()
         except Exception as e:
-            print(f"Warning: Some variables not available. Error: {e}")
-            print("Falling back to basic variables...")
-            
-            # Fallback to basic variables
-            basic_vars = ["time", "station_id", "WindSpeed", "AirTemperature", 
-                         "AtmosphericPressure", "WaveHeight", "Hmax", "Tp"]
-            self.e.variables = basic_vars
-            df = self.e.to_pandas(index_col="time (UTC)", parse_dates=True)
-            return df.dropna()
+            print(f"Error: {e}")
+            raise
     
     def fetch_all_data(self, days_back=30):
-        """Fetch all available variables."""
-        return self.fetch_data(days_back=days_back, variables=None)
+        """Fetch ALL available variables."""
+        return self.fetch_data(days_back=days_back, include_all=True)
     
     def fetch_basic_data(self, days_back=30):
-        """Fetch only the original 6 variables (for backward compatibility)."""
-        basic_vars = ["WindSpeed", "AirTemperature", "AtmosphericPressure", 
-                     "WaveHeight", "Hmax", "Tp"]
-        return self.fetch_data(days_back=days_back, variables=basic_vars)
+        """Fetch only basic 6 variables (backward compatible)."""
+        return self.fetch_data(days_back=days_back, include_all=False)
 
     def get_baseline_subset(self, df):
         """Returns only traditional meteorological factors."""
@@ -170,7 +170,7 @@ class IrishBuoyData:
         return df[available]
     
     def get_all_features(self, df):
-        """Returns all available features."""
+        """Returns all features."""
         return df
     
     def get_met_data(self, df):
@@ -189,7 +189,7 @@ class IrishBuoyData:
         return df[available]
     
     def list_available_columns(self, df):
-        """Print all columns in the DataFrame."""
+        """Print all available columns in the DataFrame."""
         print("="*70)
         print(f"AVAILABLE COLUMNS FOR {self.station_id}")
         print("="*70)
@@ -216,4 +216,70 @@ class IrishBuoyData:
             print(f"  ✓ {col}")
         
         print(f"\nTotal columns: {len(df.columns)}")
+        
+        return df.columns.tolist()
 
+
+# Test the corrected code
+if __name__ == "__main__":
+    print("="*70)
+    print("IRISH BUOY DATA - COMPLETE ACCESS TEST")
+    print("="*70)
+    
+    buoy = IrishBuoyData(station_id="M5")
+    
+    # Test 1: Basic data (backward compatible)
+    print("\n1. Testing basic data (6 variables)...")
+    df_basic = buoy.fetch_basic_data(days_back=7)
+    print(f"   ✓ Fetched {len(df_basic)} records with {len(df_basic.columns)} columns")
+    print(f"   Columns: {df_basic.columns.tolist()}")
+    
+    # Test 2: All available data
+    print("\n2. Testing all available data (16 variables)...")
+    df_all = buoy.fetch_all_data(days_back=7)
+    print(f"   ✓ Fetched {len(df_all)} records with {len(df_all.columns)} columns")
+    
+    # List what's available
+    buoy.list_available_columns(df_all)
+    
+    # Show sample
+    print("\n" + "="*70)
+    print("SAMPLE DATA - ALL VARIABLES (Latest 5 records)")
+    print("="*70)
+    print(df_all.tail())
+    
+    # Show comparison
+    print("\n" + "="*70)
+    print("COMPARISON")
+    print("="*70)
+    print(f"Basic fetch:  {len(df_basic.columns)} variables")
+    print(f"Complete fetch: {len(df_all.columns)} variables")
+    print(f"\nYou were missing: {len(df_all.columns) - len(df_basic.columns)} variables!")
+    
+    missing_vars = [col for col in df_all.columns if col not in df_basic.columns]
+    print(f"\nMissing variables were:")
+    for var in missing_vars:
+        print(f"  • {var}")
+    
+    # Test subsets
+    print("\n" + "="*70)
+    print("MET DATA")
+    print("="*70)
+    met_df = buoy.get_met_data(df_all)
+    print(met_df.tail())
+    
+    print("\n" + "="*70)
+    print("WAVE DATA")
+    print("="*70)
+    wave_df = buoy.get_wave_data(df_all)
+    print(wave_df.tail())
+    
+    print("\n" + "="*70)
+    print("WATER DATA")
+    print("="*70)
+    water_df = buoy.get_water_data(df_all)
+    print(water_df.tail())
+    
+    # Save
+    df_all.to_csv(f'buoy_{buoy.station_id}_complete.csv')
+    print(f"\n✓ Saved complete data to 'buoy_{buoy.station_id}_complete.csv'")
