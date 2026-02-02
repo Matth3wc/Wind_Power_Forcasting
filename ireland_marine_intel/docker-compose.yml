@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: marine_intel_app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://marine:marine_pass@db:5432/marine_intel
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./models/saved:/app/models/saved
+    restart: unless-stopped
+    networks:
+      - marine_net
+
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: marine_intel_db
+    environment:
+      - POSTGRES_USER=marine
+      - POSTGRES_PASSWORD=marine_pass
+      - POSTGRES_DB=marine_intel
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marine -d marine_intel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - marine_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: marine_intel_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - marine_net
+
+volumes:
+  postgres_data:
+
+networks:
+  marine_net:
+    driver: bridge
