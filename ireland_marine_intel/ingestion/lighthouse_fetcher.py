@@ -216,13 +216,25 @@ class LighthouseFetcher:
                 dfs_to_merge.append(pd.DataFrame({'air_pressure': pressure_df['Pressure']}))
         
         # Suit_A usually contains temperature and humidity
+        # Column names: DryA = dry bulb air temp, HumA = humidity
         if isinstance(suit_a_df, pd.DataFrame) and not suit_a_df.empty:
             suit_cols = {}
-            for col in suit_a_df.columns:
-                if 'Temp' in col and 'air_temperature' not in suit_cols:
-                    suit_cols['air_temperature'] = suit_a_df[col]
-                if 'RH' in col or 'Humidity' in col:
-                    suit_cols['humidity'] = suit_a_df[col]
+            # Check for DryA (dry bulb air temperature) first, then any 'Temp' column
+            if 'DryA' in suit_a_df.columns:
+                suit_cols['air_temperature'] = suit_a_df['DryA']
+            else:
+                for col in suit_a_df.columns:
+                    if 'Temp' in col and 'air_temperature' not in suit_cols:
+                        suit_cols['air_temperature'] = suit_a_df[col]
+            
+            # Check for HumA (humidity) first, then any RH/Humidity column
+            if 'HumA' in suit_a_df.columns:
+                suit_cols['humidity'] = suit_a_df['HumA']
+            else:
+                for col in suit_a_df.columns:
+                    if 'RH' in col or 'Humidity' in col:
+                        suit_cols['humidity'] = suit_a_df[col]
+            
             if suit_cols:
                 dfs_to_merge.append(pd.DataFrame(suit_cols))
         

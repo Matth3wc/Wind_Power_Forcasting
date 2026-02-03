@@ -1,5 +1,7 @@
 """
 Forecast API routes.
+
+Supports forecasting for both buoy and lighthouse/coastal stations.
 """
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
@@ -8,11 +10,45 @@ from fastapi import APIRouter, HTTPException, Query, Request
 import pandas as pd
 import numpy as np
 
-from config.settings import ALL_STATIONS, BUOY_STATIONS, COASTAL_STATIONS
+from config.settings import ALL_STATIONS, BUOY_STATIONS, COASTAL_STATIONS, LIGHTHOUSE_STATIONS
 from api.models.schemas import ForecastResponse, ForecastPoint, RegionalForecastRequest
 from ingestion.buoy_fetcher import BuoyFetcher
+from ingestion.lighthouse_fetcher import LighthouseFetcher
 
 router = APIRouter()
+
+
+def is_buoy_station(station_id: str) -> bool:
+    """Check if station is a buoy (ERDDAP data source)."""
+    return station_id in BUOY_STATIONS or station_id in COASTAL_STATIONS
+
+
+def is_lighthouse_station(station_id: str) -> bool:
+    """Check if station is a Met Éireann AWS station."""
+    return station_id in LIGHTHOUSE_STATIONS
+
+
+async def fetch_station_data(station_id: str, days_back: int = 14) -> pd.DataFrame:
+    """
+    Fetch historical data for a station, using appropriate fetcher.
+    
+    Args:
+        station_id: Station identifier
+        days_back: Number of days of historical data
+        
+    Returns:
+        DataFrame with weather data
+    """
+    if is_buoy_station(station_id):
+        fetcher = BuoyFetcher()
+        return await fetcher.fetch_single_buoy(station_id, days_back=days_back)
+    elif is_lighthouse_station(station_id):
+        # Lighthouse data is limited to 7 days max due to API structure
+        actual_days = min(days_back, 7)
+        async with LighthouseFetcher() as fetcher:
+            return await fetcher.fetch_met_eireann_data(station_id, days_back=actual_days)
+    else:
+        raise ValueError(f"Unknown station type for '{station_id}'")
 
 
 @router.get("/{station_id}")
@@ -23,12 +59,12 @@ async def get_station_forecast(
         description="Forecast horizons in hours"
     ),
     variables: List[str] = Query(
-        default=["wind_speed", "wave_height", "air_pressure"],
+        default=["wind_speed", "wave_height", "air_pressure", "air_temperature"],
         description="Variables to forecast"
     )
 ) -> Dict[str, Any]:
     """
-    Get weather forecasts for a specific station.
+    Get weather forecasts for a specific station (buoy or lighthouse).
     
     Uses a Vector Autoregressive (VAR) model trained on recent historical data
     to generate forecasts at specified horizons.
@@ -41,29 +77,19 @@ async def get_station_forecast(
     if station_id not in ALL_STATIONS:
         raise HTTPException(status_code=404, detail=f"Station '{station_id}' not found")
     
-    # Only buoys have ERDDAP data for forecasting
-    buoy_stations = {**BUOY_STATIONS, **COASTAL_STATIONS}
-    if station_id not in buoy_stations:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Forecasting not available for station type: {ALL_STATIONS[station_id]['type']}"
-        )
-    
-    # Fetch recent data for model training
-    fetcher = BuoyFetcher()
-    
+    # Fetch recent data for model training using appropriate fetcher
     try:
-        df = await fetcher.fetch_single_buoy(station_id, days_back=14)
+        df = await fetch_station_data(station_id, days_back=14)
     except Exception as e:
         raise HTTPException(
             status_code=503,
             detail=f"Failed to fetch data for forecasting: {str(e)}"
         )
     
-    if len(df) < 48:  # Need at least 48 hours of data
+    if len(df) < 24:  # Need at least 24 hours of data (reduced for lighthouse stations)
         raise HTTPException(
             status_code=400,
-            detail="Insufficient historical data for forecasting"
+            detail=f"Insufficient historical data for forecasting (got {len(df)} records)"
         )
     
     # Prepare data for VAR model
@@ -149,34 +175,33 @@ async def get_regional_forecast(
     """
     Get forecasts for multiple stations in a region.
     
+    Supports both buoy and lighthouse stations for comprehensive regional coverage.
     Useful for getting an overview of expected conditions across an area.
     """
     station_ids = request_body.station_ids
     horizons = request_body.horizons or [6, 12, 24, 48]
     
-    # Validate stations
-    buoy_stations = {**BUOY_STATIONS, **COASTAL_STATIONS}
-    valid_stations = [s for s in station_ids if s in buoy_stations]
+    # Validate stations - now include all station types
+    valid_stations = [s for s in station_ids if s in ALL_STATIONS]
     
     if not valid_stations:
         raise HTTPException(
             status_code=400,
-            detail="No valid buoy stations provided for forecasting"
+            detail="No valid stations provided for forecasting"
         )
     
-    # Fetch data for all stations
-    fetcher = BuoyFetcher()
+    # Fetch data for all stations using appropriate fetchers
     forecasts = {}
     
     for station_id in valid_stations:
         try:
-            df = await fetcher.fetch_single_buoy(station_id, days_back=14)
+            df = await fetch_station_data(station_id, days_back=14)
             
-            if len(df) < 48:
+            if len(df) < 24:  # Reduced minimum for lighthouse stations
                 continue
             
-            # Simplified forecast
-            variables = ["wind_speed", "wave_height", "air_pressure"]
+            # Simplified forecast - include variables common to both station types
+            variables = ["wind_speed", "wave_height", "air_pressure", "air_temperature"]
             available_vars = [v for v in variables if v in df.columns]
             
             if not available_vars:
@@ -213,10 +238,15 @@ async def get_regional_forecast(
             detail="Failed to generate forecasts for any station"
         )
     
-    # Compute regional summary
+    # Compute regional summary (include all common variables)
     regional_summary = {}
     for horizon in horizons:
-        horizon_values = {"wind_speed": [], "wave_height": [], "air_pressure": []}
+        horizon_values = {
+            "wind_speed": [], 
+            "wave_height": [], 
+            "air_pressure": [],
+            "air_temperature": []
+        }
         
         for station_id, station_forecasts in forecasts.items():
             for fc in station_forecasts:
@@ -245,6 +275,34 @@ async def get_regional_forecast(
     }
 
 
+@router.get("/regional/ireland")
+async def get_ireland_regional_forecast(
+    horizons: List[int] = Query(
+        default=[6, 12, 24, 48],
+        description="Forecast horizons in hours"
+    )
+) -> Dict[str, Any]:
+    """
+    Get a comprehensive regional forecast for all Irish stations.
+    
+    Combines both buoy (offshore) and lighthouse (coastal) stations
+    to provide a complete picture of expected marine weather conditions.
+    """
+    from api.models.schemas import RegionalForecastRequest
+    
+    # Include all stations
+    all_station_ids = list(ALL_STATIONS.keys())
+    
+    # Create request body
+    request_body = RegionalForecastRequest(
+        station_ids=all_station_ids,
+        horizons=horizons
+    )
+    
+    # Use the regional forecast endpoint
+    return await get_regional_forecast(request_body)
+
+
 @router.get("/ensemble/{station_id}")
 async def get_ensemble_forecast(
     station_id: str,
@@ -254,6 +312,7 @@ async def get_ensemble_forecast(
     Get ensemble forecast with multiple model runs.
     
     Provides uncertainty quantification through ensemble spread.
+    Supports both buoy and lighthouse stations.
     """
     if station_id not in ALL_STATIONS:
         raise HTTPException(status_code=404, detail=f"Station '{station_id}' not found")
@@ -261,17 +320,16 @@ async def get_ensemble_forecast(
     # This is a placeholder for a more sophisticated ensemble approach
     # In production, this would run multiple model configurations
     
-    fetcher = BuoyFetcher()
-    
     try:
-        df = await fetcher.fetch_single_buoy(station_id, days_back=14)
+        df = await fetch_station_data(station_id, days_back=14)
     except Exception as e:
         raise HTTPException(status_code=503, detail=str(e))
     
-    if len(df) < 48:
-        raise HTTPException(status_code=400, detail="Insufficient data")
+    if len(df) < 24:
+        raise HTTPException(status_code=400, detail=f"Insufficient data (got {len(df)} records)")
     
-    variables = ["wind_speed", "wave_height"]
+    # Include wind_speed for all stations, wave_height only for buoys
+    variables = ["wind_speed", "wave_height", "air_temperature"]
     available_vars = [v for v in variables if v in df.columns]
     
     df_hourly = df[available_vars].resample("1h").mean().interpolate(method="time", limit=3).dropna()
