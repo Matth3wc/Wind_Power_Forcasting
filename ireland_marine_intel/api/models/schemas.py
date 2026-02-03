@@ -176,7 +176,7 @@ class ErrorResponse(BaseModel):
 class HistoricalDataRequest(BaseModel):
     """Request parameters for historical data."""
     days_back: int = Field(default=7, ge=1, le=365)
-    resample_freq: Optional[str] = Field(default="1H", description="Resample frequency (e.g., '1H', '30T')")
+    resample_freq: Optional[str] = Field(default="1h", description="Resample frequency (e.g., '1h', '30min')")
 
 
 class ForecastRequest(BaseModel):

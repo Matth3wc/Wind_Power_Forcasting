@@ -173,7 +173,7 @@ async def get_flow_analysis(
     valid_stations = {}
     for station_id, df in data.items():
         if variable in df.columns:
-            valid_stations[station_id] = df[variable].resample("1H").mean().interpolate(limit=3)
+            valid_stations[station_id] = df[variable].resample("1h").mean().interpolate(limit=3)
     
     if len(valid_stations) < 2:
         raise HTTPException(
@@ -332,7 +332,7 @@ async def get_cluster_analysis(
                 df1 = data[sid1]
                 if "wind_speed" not in df1.columns:
                     continue
-                s1 = df1["wind_speed"].resample("1H").mean()
+                s1 = df1["wind_speed"].resample("1h").mean()
                 
                 for j, sid2 in enumerate(station_ids[i + 1:], i + 1):
                     if sid2 not in data:
@@ -340,7 +340,7 @@ async def get_cluster_analysis(
                     df2 = data[sid2]
                     if "wind_speed" not in df2.columns:
                         continue
-                    s2 = df2["wind_speed"].resample("1H").mean()
+                    s2 = df2["wind_speed"].resample("1h").mean()
                     
                     # Compute correlation
                     common = s1.index.intersection(s2.index)

@@ -73,7 +73,7 @@ class ForecastManager:
             data = data.select_dtypes(include=[np.number]).copy()
         
         # Resample to hourly
-        data = data.resample('1H').mean()
+        data = data.resample('1h').mean()
         data = data.interpolate(method='time', limit=3)
         data = data.dropna()
         

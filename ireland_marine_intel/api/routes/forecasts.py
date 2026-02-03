@@ -75,7 +75,7 @@ async def get_station_forecast(
         )
     
     # Resample to hourly
-    df_hourly = df[available_vars].resample("1H").mean().interpolate(method="time", limit=3)
+    df_hourly = df[available_vars].resample("1h").mean().interpolate(method="time", limit=3)
     df_hourly = df_hourly.dropna()
     
     if len(df_hourly) < 48:
@@ -182,7 +182,7 @@ async def get_regional_forecast(
             if not available_vars:
                 continue
             
-            df_hourly = df[available_vars].resample("1H").mean().interpolate(method="time", limit=3)
+            df_hourly = df[available_vars].resample("1h").mean().interpolate(method="time", limit=3)
             df_hourly = df_hourly.dropna()
             
             forecast_df, _ = _simple_forecast(df_hourly, max(horizons), available_vars)
@@ -274,7 +274,7 @@ async def get_ensemble_forecast(
     variables = ["wind_speed", "wave_height"]
     available_vars = [v for v in variables if v in df.columns]
     
-    df_hourly = df[available_vars].resample("1H").mean().interpolate(method="time", limit=3).dropna()
+    df_hourly = df[available_vars].resample("1h").mean().interpolate(method="time", limit=3).dropna()
     
     # Generate ensemble members (simplified)
     n_members = 10
@@ -386,7 +386,7 @@ def _simple_forecast(
     forecast_index = pd.date_range(
         start=df.index[-1] + pd.Timedelta(hours=1),
         periods=steps,
-        freq="1H"
+        freq="1h"
     )
     
     forecast_df = pd.DataFrame(forecasts, index=forecast_index)

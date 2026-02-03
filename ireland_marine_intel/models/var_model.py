@@ -228,7 +228,7 @@ class VARForecaster:
         forecast_index = pd.date_range(
             start=pd.Timestamp.now(tz='UTC'),
             periods=steps,
-            freq='1H'
+            freq='1h'
         )
         
         forecast_df = pd.DataFrame(
@@ -372,7 +372,7 @@ class MultiStationForecaster:
         
         for station_id, df in data.items():
             if variable in df.columns:
-                series = df[variable].resample('1H').mean()
+                series = df[variable].resample('1h').mean()
                 aligned_data[station_id] = series
         
         if len(aligned_data) < 2:

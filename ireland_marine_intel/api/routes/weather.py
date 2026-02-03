@@ -7,11 +7,22 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, Query, Request
 import pandas as pd
 
-from config.settings import ALL_STATIONS
+from config.settings import ALL_STATIONS, BUOY_STATIONS, COASTAL_STATIONS, LIGHTHOUSE_STATIONS
 from api.models.schemas import WeatherReading, LatestReadingsResponse, HistoricalDataResponse
 from ingestion.buoy_fetcher import BuoyFetcher
+from ingestion.lighthouse_fetcher import LighthouseFetcher
 
 router = APIRouter()
+
+
+def is_buoy_station(station_id: str) -> bool:
+    """Check if station is a buoy (ERDDAP data source)."""
+    return station_id in BUOY_STATIONS or station_id in COASTAL_STATIONS
+
+
+def is_lighthouse_station(station_id: str) -> bool:
+    """Check if station is a Met Éireann AWS station."""
+    return station_id in LIGHTHOUSE_STATIONS
 
 
 def df_row_to_weather_reading(station_id: str, row: pd.Series, timestamp: datetime) -> WeatherReading:
@@ -88,7 +99,7 @@ async def get_station_latest(station_id: str, request: Request) -> WeatherReadin
 async def get_station_history(
     station_id: str,
     days_back: int = Query(7, ge=1, le=365, description="Number of days of history"),
-    resample_freq: Optional[str] = Query("1H", description="Resample frequency (e.g., '1H', '30T', 'D')")
+    resample_freq: Optional[str] = Query("1h", description="Resample frequency (e.g., '1h', '30min', 'D')")
 ) -> Dict[str, Any]:
     """
     Get historical weather data for a station.
@@ -101,10 +112,20 @@ async def get_station_history(
     if station_id not in ALL_STATIONS:
         raise HTTPException(status_code=404, detail=f"Station '{station_id}' not found")
     
-    fetcher = BuoyFetcher()
-    
     try:
-        df = await fetcher.fetch_single_buoy(station_id, days_back=days_back)
+        # Use appropriate fetcher based on station type
+        if is_buoy_station(station_id):
+            fetcher = BuoyFetcher()
+            df = await fetcher.fetch_single_buoy(station_id, days_back=days_back)
+        elif is_lighthouse_station(station_id):
+            # Met Éireann stations - limit to 7 days max due to API structure
+            actual_days = min(days_back, 7)
+            async with LighthouseFetcher() as fetcher:
+                df = await fetcher.fetch_met_eireann_data(station_id, days_back=actual_days)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown station type for '{station_id}'")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=503,
@@ -161,10 +182,20 @@ async def get_station_statistics(
     if station_id not in ALL_STATIONS:
         raise HTTPException(status_code=404, detail=f"Station '{station_id}' not found")
     
-    fetcher = BuoyFetcher()
-    
     try:
-        df = await fetcher.fetch_single_buoy(station_id, days_back=days_back)
+        # Use appropriate fetcher based on station type
+        if is_buoy_station(station_id):
+            fetcher = BuoyFetcher()
+            df = await fetcher.fetch_single_buoy(station_id, days_back=days_back)
+        elif is_lighthouse_station(station_id):
+            # Met Éireann stations - limit to 7 days max
+            actual_days = min(days_back, 7)
+            async with LighthouseFetcher() as fetcher:
+                df = await fetcher.fetch_met_eireann_data(station_id, days_back=actual_days)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown station type for '{station_id}'")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=503,

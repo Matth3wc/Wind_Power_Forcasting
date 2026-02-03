@@ -87,7 +87,7 @@ class StationNetworkBuilder:
         aligned_data = {}
         for station_id, df in data.items():
             if variable in df.columns:
-                series = df[variable].resample('1H').mean()
+                series = df[variable].resample('1h').mean()
                 aligned_data[station_id] = series
         
         station_ids = list(aligned_data.keys())
@@ -429,7 +429,7 @@ class ClusterAnalyzer:
         aligned = {}
         for station_id, df in data.items():
             if variable in df.columns:
-                series = df[variable].resample('1H').mean()
+                series = df[variable].resample('1h').mean()
                 aligned[station_id] = series
         
         if len(aligned) < n_clusters:

@@ -164,6 +164,7 @@ class BuoyFetcher:
                     df.loc[spike_mask, col] = np.nan
         
         # Interpolate small gaps (up to 3 consecutive missing values)
+        df = df.infer_objects(copy=False)
         df = df.interpolate(method="time", limit=3)
         
         return df
@@ -218,7 +219,7 @@ class BuoyDataProcessor:
     def resample_hourly(df: pd.DataFrame) -> pd.DataFrame:
         """Resample data to hourly frequency."""
         numeric_cols = df.select_dtypes(include=[np.number]).columns
-        return df[numeric_cols].resample("1H").mean()
+        return df[numeric_cols].resample("1h").mean()
     
     @staticmethod
     def compute_statistics(df: pd.DataFrame, window: str = "24H") -> pd.DataFrame:
@@ -245,7 +246,7 @@ class BuoyDataProcessor:
     @staticmethod
     def align_stations(
         data: Dict[str, pd.DataFrame],
-        resample_freq: str = "1H"
+        resample_freq: str = "1h"
     ) -> pd.DataFrame:
         """
         Align data from multiple stations to common timestamps.

@@ -117,92 +117,59 @@ BUOY_STATIONS = {
     },
 }
 
-COASTAL_STATIONS = {
-    # Irish Lights / Coastal network
-    "IL1": {
-        "name": "IL1 Buoy (Ballybunnion)",
-        "lat": 52.5420,
-        "lon": -9.7820,
-        "type": "coastal_buoy",
-        "depth_m": 30,
-        "description": "Coastal buoy near Ballybunnion"
-    },
-    "IL2": {
-        "name": "IL2 Buoy (Finnis)",
-        "lat": 53.0470,
-        "lon": -9.4850,
-        "type": "coastal_buoy",
-        "depth_m": 25,
-        "description": "Coastal buoy at Finnis Rock"
-    },
-    "IL3": {
-        "name": "IL3 Buoy (South Hunter)",
-        "lat": 54.8780,
-        "lon": -5.7550,
-        "type": "coastal_buoy",
-        "depth_m": 35,
-        "description": "Northern coastal buoy"
-    },
-    "IL4": {
-        "name": "IL4 Buoy (Splaugh)",
-        "lat": 52.2390,
-        "lon": -6.2800,
-        "type": "coastal_buoy",
-        "depth_m": 20,
-        "description": "Southeast coastal buoy"
-    },
-}
+# Note: IL1-IL4 coastal buoys are not available in ERDDAP - using Met Éireann AWS stations instead
+COASTAL_STATIONS = {}
 
-# Coastal lighthouses and weather stations
+# Met Éireann Automatic Weather Stations (real-time data from opendata2.met.ie)
+# Station names must match URL path format on opendata2.met.ie/obs/
 LIGHTHOUSE_STATIONS = {
-    "MLIN": {
-        "name": "Mace Head",
-        "lat": 53.3269,
-        "lon": -9.8989,
-        "type": "lighthouse",
-        "description": "Atmospheric research station"
-    },
-    "BELMULLET": {
-        "name": "Belmullet",
-        "lat": 54.2275,
-        "lon": -10.0078,
-        "type": "synoptic",
-        "description": "Met Éireann synoptic station"
-    },
-    "VALENTIA": {
-        "name": "Valentia Observatory",
-        "lat": 51.9381,
-        "lon": -10.2436,
-        "type": "observatory",
-        "description": "Historical weather observatory"
-    },
-    "MALIN_HEAD": {
+    "MalinHead": {
         "name": "Malin Head",
         "lat": 55.3719,
         "lon": -7.3389,
         "type": "synoptic",
-        "description": "Ireland's most northerly point"
+        "met_ie_id": "MalinHead",
+        "description": "Ireland's most northerly point - Met Éireann AWS"
     },
-    "ROCHES_POINT": {
+    "Belmullet": {
+        "name": "Belmullet",
+        "lat": 54.2275,
+        "lon": -10.0078,
+        "type": "synoptic",
+        "met_ie_id": "Belmullet",
+        "description": "Met Éireann synoptic station"
+    },
+    "Valentia": {
+        "name": "Valentia Observatory",
+        "lat": 51.9381,
+        "lon": -10.2436,
+        "type": "observatory",
+        "met_ie_id": "Valentia",
+        "description": "Historical weather observatory - Met Éireann AWS"
+    },
+    "RochesPoint": {
         "name": "Roches Point",
         "lat": 51.7925,
         "lon": -8.2492,
         "type": "lighthouse",
-        "description": "Cork Harbour lighthouse"
+        "met_ie_id": "RochesPoint",
+        "description": "Cork Harbour lighthouse - Met Éireann AWS"
     },
-    "HOOK_HEAD": {
-        "name": "Hook Head",
-        "lat": 52.1239,
-        "lon": -6.9294,
-        "type": "lighthouse",
-        "description": "One of the oldest lighthouses"
+    "MaceHead": {
+        "name": "Mace Head",
+        "lat": 53.3269,
+        "lon": -9.8989,
+        "type": "observatory",
+        "met_ie_id": "MaceHead",
+        "description": "Atmospheric research station - Met Éireann AWS"
     },
-    "LOOP_HEAD": {
-        "name": "Loop Head",
-        "lat": 52.5608,
-        "lon": -9.9306,
-        "type": "lighthouse",
-        "description": "Clare coast lighthouse"
+    "SherkinIsland": {
+        "name": "Sherkin Island",
+        "lat": 51.4667,
+        "lon": -9.4167,
+        "type": "coastal",
+        "met_ie_id": "SherkinIsland",
+        "description": "West Cork coastal station - Met Éireann AWS"
     },
 }
 

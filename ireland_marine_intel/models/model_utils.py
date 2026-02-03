@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def prepare_time_series(
     df: pd.DataFrame,
-    freq: str = "1H",
+    freq: str = "1h",
     interpolate_limit: int = 3
 ) -> pd.DataFrame:
     """
@@ -210,7 +210,7 @@ def detect_outliers(
 def align_multiple_series(
     data: Dict[str, pd.DataFrame],
     variable: str,
-    freq: str = "1H"
+    freq: str = "1h"
 ) -> pd.DataFrame:
     """
     Align multiple time series from different sources.

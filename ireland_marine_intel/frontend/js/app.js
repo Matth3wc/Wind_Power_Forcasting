@@ -73,15 +73,19 @@ async function initializeStations() {
 // Fallback station data
 function loadFallbackStations() {
     const fallbackStations = {
+        // Offshore buoys (ERDDAP IWBNetwork)
         "M2": { station_id: "M2", name: "M2 Buoy", latitude: 53.48, longitude: -5.425, station_type: "offshore_buoy" },
         "M3": { station_id: "M3", name: "M3 Buoy", latitude: 51.2166, longitude: -10.55, station_type: "offshore_buoy" },
         "M4": { station_id: "M4", name: "M4 Buoy", latitude: 55.0, longitude: -10.0, station_type: "offshore_buoy" },
         "M5": { station_id: "M5", name: "M5 Buoy", latitude: 51.69, longitude: -6.704, station_type: "offshore_buoy" },
         "M6": { station_id: "M6", name: "M6 Buoy", latitude: 53.0748, longitude: -15.8814, station_type: "offshore_buoy" },
-        "IL1": { station_id: "IL1", name: "IL1 Buoy (Ballybunnion)", latitude: 52.542, longitude: -9.782, station_type: "coastal_buoy" },
-        "IL2": { station_id: "IL2", name: "IL2 Buoy (Finnis)", latitude: 53.047, longitude: -9.485, station_type: "coastal_buoy" },
-        "IL3": { station_id: "IL3", name: "IL3 Buoy (South Hunter)", latitude: 54.878, longitude: -5.755, station_type: "coastal_buoy" },
-        "IL4": { station_id: "IL4", name: "IL4 Buoy (Splaugh)", latitude: 52.239, longitude: -6.28, station_type: "coastal_buoy" }
+        // Met Éireann AWS stations
+        "MalinHead": { station_id: "MalinHead", name: "Malin Head", latitude: 55.3719, longitude: -7.3389, station_type: "synoptic" },
+        "Belmullet": { station_id: "Belmullet", name: "Belmullet", latitude: 54.2275, longitude: -10.0078, station_type: "synoptic" },
+        "Valentia": { station_id: "Valentia", name: "Valentia Observatory", latitude: 51.9381, longitude: -10.2436, station_type: "observatory" },
+        "RochesPoint": { station_id: "RochesPoint", name: "Roches Point", latitude: 51.7925, longitude: -8.2492, station_type: "lighthouse" },
+        "MaceHead": { station_id: "MaceHead", name: "Mace Head", latitude: 53.3269, longitude: -9.8989, station_type: "observatory" },
+        "SherkinIsland": { station_id: "SherkinIsland", name: "Sherkin Island", latitude: 51.4667, longitude: -9.4167, station_type: "coastal" }
     };
     
     AppState.stations = fallbackStations;
@@ -204,10 +208,13 @@ async function fetchHistoricalData(stationId) {
     
     try {
         const response = await fetch(
-            `${CONFIG.API_BASE_URL}/api/weather/${stationId}/history?days_back=${days}&resample_freq=1H`
+            `${CONFIG.API_BASE_URL}/api/weather/${stationId}/history?days_back=${days}&resample_freq=1h`
         );
         
-        if (!response.ok) throw new Error('Failed to fetch history');
+        if (!response.ok) {
+            console.warn(`History not available for ${stationId}: ${response.status}`);
+            return;
+        }
         
         const data = await response.json();
         updateHistoryChart(data.data, variable);
@@ -223,7 +230,11 @@ async function fetchForecast(stationId) {
             `${CONFIG.API_BASE_URL}/api/forecasts/${stationId}?horizons=6&horizons=12&horizons=24&horizons=48&horizons=72`
         );
         
-        if (!response.ok) throw new Error('Failed to fetch forecast');
+        if (!response.ok) {
+            // Forecasts are only available for buoy stations
+            console.warn(`Forecast not available for ${stationId}: ${response.status}`);
+            return;
+        }
         
         const data = await response.json();
         updateForecastChart(data);

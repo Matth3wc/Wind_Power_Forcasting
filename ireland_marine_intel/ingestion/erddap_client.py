@@ -367,7 +367,7 @@ class MarineDataFetcher:
         self,
         station_id: str,
         days_back: int = 30,
-        resample_freq: Optional[str] = "1H"
+        resample_freq: Optional[str] = "1h"
     ) -> pd.DataFrame:
         """
         Get historical data for a station, optionally resampled.
@@ -395,7 +395,7 @@ class MarineDataFetcher:
         self,
         station_ids: List[str],
         days_back: int = 7,
-        resample_freq: str = "1H"
+        resample_freq: str = "1h"
     ) -> pd.DataFrame:
         """
         Get data for multiple stations with aligned timestamps.
