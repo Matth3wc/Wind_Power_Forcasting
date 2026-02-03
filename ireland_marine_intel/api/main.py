@@ -3,14 +3,16 @@ FastAPI main application for Ireland Marine Weather Intelligence Platform.
 """
 import asyncio
 import logging
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 import uvicorn
 
 from config.settings import get_settings
@@ -23,6 +25,10 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Get the base directory (where api/ is located)
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
 # Global data manager
 data_manager: RealTimeDataManager = None
@@ -75,6 +81,16 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Mount static directories FIRST (before routes)
+# This ensures /css and /js paths work when index.html is served from root
+try:
+    if FRONTEND_DIR.exists():
+        app.mount("/css", StaticFiles(directory=str(FRONTEND_DIR / "css")), name="css")
+        app.mount("/js", StaticFiles(directory=str(FRONTEND_DIR / "js")), name="js")
+        logger.info(f"Mounted static files from {FRONTEND_DIR}")
+except Exception as e:
+    logger.warning(f"Could not mount static files: {e}")
 
 # CORS middleware
 app.add_middleware(
@@ -267,35 +283,6 @@ async def api_status():
         "stations_with_data": len(data_manager.get_latest_readings()),
         "last_update": data_manager.scheduler._last_data.get("timestamp", None),
     }
-
-
-# Mount static files for frontend
-import os
-from pathlib import Path
-from fastapi.responses import FileResponse
-
-# Get the base directory (where api/ is located)
-BASE_DIR = Path(__file__).resolve().parent.parent
-FRONTEND_DIR = BASE_DIR / "frontend"
-
-# Serve frontend static files
-@app.get("/app")
-@app.get("/app/")
-async def serve_frontend():
-    """Serve the frontend application."""
-    index_path = FRONTEND_DIR / "index.html"
-    if index_path.exists():
-        return FileResponse(index_path)
-    return {"error": "Frontend not found"}
-
-# Mount static directories
-try:
-    app.mount("/css", StaticFiles(directory=str(FRONTEND_DIR / "css")), name="css")
-    app.mount("/js", StaticFiles(directory=str(FRONTEND_DIR / "js")), name="js")
-    app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
-    logger.info(f"Mounted frontend from {FRONTEND_DIR}")
-except Exception as e:
-    logger.warning(f"Could not mount frontend static files: {e}")
 
 
 if __name__ == "__main__":

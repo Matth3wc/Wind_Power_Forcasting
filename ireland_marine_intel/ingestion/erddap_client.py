@@ -72,16 +72,20 @@ class ERDDAPClient:
         # Build variable list
         var_str = ",".join(variables)
         
-        # Build constraints - time constraints don't need quotes, string values do
+        # Build constraints - encode operators and handle quoting
+        # ERDDAP requires > and < to be URL-encoded in the query string
         constraint_parts = []
         for key, value in constraints.items():
+            # URL-encode the operators in the key (>= becomes %3E=, <= becomes %3C=)
+            encoded_key = key.replace(">", "%3E").replace("<", "%3C")
+            
             # Time constraints should not have quotes around the value
             if 'time' in key.lower():
-                constraint_parts.append(f'{key}{value}')
+                constraint_parts.append(f'{encoded_key}{value}')
             elif isinstance(value, str):
-                constraint_parts.append(f'{key}"{value}"')
+                constraint_parts.append(f'{encoded_key}"{value}"')
             else:
-                constraint_parts.append(f"{key}{value}")
+                constraint_parts.append(f"{encoded_key}{value}")
         
         constraint_str = "&".join(constraint_parts)
         
