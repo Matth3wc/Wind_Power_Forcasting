@@ -1,0 +1,68 @@
+[
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/main.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/main.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/main.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/application.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/application.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/application.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/application.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/renderer.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/renderer.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/renderer.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/renderer.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/shader.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/shader.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/shader.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/shader.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/mesh.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/mesh.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/mesh.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/mesh.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/cad_loader.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/cad_loader.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/cad_loader.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/cad_loader.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/camera.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/camera.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/camera.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/camera.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/wind_simulation.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/wind_simulation.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/wind_simulation.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/wind_simulation.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/blade_physics.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/blade_physics.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/blade_physics.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/blade_physics.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/stats_overlay.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/stats_overlay.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/stats_overlay.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/stats_overlay.cpp.o"
+},
+{
+  "directory": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/build",
+  "command": "/usr/bin/c++  -I/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/WindTurbineBladeSim.dir/src/text_renderer.cpp.o -c /Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/text_renderer.cpp",
+  "file": "/Users/matthewconway/Documents/GitHub/Wind_Power_Forcasting/Blade_Profile_sim/src/text_renderer.cpp",
+  "output": "CMakeFiles/WindTurbineBladeSim.dir/src/text_renderer.cpp.o"
+}
+]

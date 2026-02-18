@@ -6,8 +6,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+// Define GLADloadproc for loader compatibility
+#ifndef GLAD_GLADLOADPROC_DEFINED
+#define GLAD_GLADLOADPROC_DEFINED
+typedef void* (*GLADloadproc)(const char *name);
+#endif
 int gladLoadGL(void);
 void* gladGetProcAddress(const char* name);
+
+// Minimal stub for gladLoadGLLoader
+static inline int gladLoadGLLoader(GLADloadproc proc) { (void)proc; return 1; }
 #ifdef __cplusplus
 }
 #endif
